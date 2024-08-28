@@ -17,7 +17,7 @@ interface IERC7766 /* is IERC721, IERC165 */ {
         uint256 _privilegeId
     );
 
-    /// @notice This function exercised a specific privilege of a token if succeeds.
+    /// @notice This function exercise a specific privilege of a token.
     /// @dev Throws if `_privilegeId` is not a valid privilegeId.
     /// @param _to  the address to benifit from the privilege.
     /// @param _tokenId  the NFT tokenID.
@@ -28,7 +28,7 @@ interface IERC7766 /* is IERC721, IERC165 */ {
         uint256 _tokenId,
         uint256 _privilegeId,
         bytes calldata _data
-    ) external returns (bool _success);
+    ) external;
 
     /// @notice This function is to check whether a specific privilege of a token can be exercised.
     /// @dev Throws if `_privilegeId` is not a valid privilegeId.
