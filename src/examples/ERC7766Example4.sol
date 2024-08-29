@@ -8,9 +8,17 @@ import "../interfaces/IERC7766.sol";
 import "../interfaces/IERC7766Metadata.sol";
 
 contract ERC7766Example is ERC721, IERC7766, IERC7766Metadata {
+    /// @notice This event emitted when some specific privilege are successfully exercised.
+    /// @param _operator  the address who exercised the privilege.
+    /// @param _toArr  the addresses to benifit from the privilege.
+    /// @param _tokenIds  the NFT tokenID array.
+    /// @param _privilegeIds  the privilegeID array.
+    event BatchPrivilegeExercised(
+        address indexed _operator, address[] indexed _toArr, uint256[] indexed _tokenIds, uint256[] _privilegeIds
+    );
+
     uint256[] private privilegeIdsArr = [1, 2];
     mapping(uint256 privilegeId => bool) private privilegeIds;
-
     mapping(uint256 tokenId => mapping(uint256 privilegeId => address to)) privilegeStates;
 
     constructor(string memory name_, string memory symbol_) ERC721(name_, symbol_) {
@@ -38,6 +46,40 @@ contract ERC7766Example is ERC721, IERC7766, IERC7766Metadata {
 
         privilegeStates[_tokenId][_privilegeId] = _to;
         emit PrivilegeExercised(msg.sender, _to, _tokenId, _privilegeId);
+    }
+
+    /// @notice This function exercised a specific privilege of a token if succeeds.
+    /// @dev Throws if `_privilegeId` is not a valid privilegeId.
+    /// @param _toArr  the address to benifit from the privilege.
+    /// @param _tokenIds  the NFT tokenID.
+    /// @param _privilegeIds  the ID of the privileges.
+    /// @param _data  extra data passed in for extra message or future extension.
+    function batchExercisePrivileges(
+        address[] calldata _toArr,
+        uint256[] calldata _tokenIds,
+        uint256[] calldata _privilegeIds,
+        bytes calldata _data
+    ) external {
+        require(_tokenIds.length == _toArr.length, "Illegal _tokenIds length");
+        require(_privilegeIds.length == _toArr.length, "Illegal _privilegeIds length");
+
+        uint256 toLength = _toArr.length;
+        for (uint256 i = 0; i < toLength; i++) {
+            address to = _toArr[i];
+            uint256 tokenId = _tokenIds[i];
+            uint256 privilegeId = _privilegeIds[i];
+
+            require(ownerOf(tokenId) == msg.sender, "Token not exist");
+            require(privilegeIds[privilegeId], "Privilege not exist");
+            require(privilegeStates[tokenId][privilegeId] == address(0), "Privilege already exercised");
+
+            // Optional to deal with _data
+            dealWithData(_data);
+
+            privilegeStates[tokenId][privilegeId] = to;
+        }
+
+        emit BatchPrivilegeExercised(msg.sender, _toArr, _tokenIds, _privilegeIds);
     }
 
     function dealWithData(bytes calldata _data) internal {
