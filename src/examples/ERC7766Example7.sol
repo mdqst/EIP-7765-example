@@ -9,7 +9,7 @@ import "../interfaces/IERC7766.sol";
 import "../interfaces/IERC7766Metadata.sol";
 
 contract ERC7766Example7 is ERC721, IERC7766, IERC7766Metadata, Ownable {
-    uint256 public _privilegeId;
+    uint256 public privilegeId;
     mapping(uint256 _privilegeId => PrivilegeConfig) private privilegeIdConfigs;
     mapping(uint256 _privilegeId => bool) private exitPrivilegeIdConfigs;
 
@@ -42,25 +42,25 @@ contract ERC7766Example7 is ERC721, IERC7766, IERC7766Metadata, Ownable {
         string memory symbol_,
         address initialOwner
     ) ERC721(name_, symbol_) Ownable(initialOwner) {
-        ++_privilegeId;
-        privilegeIdConfigs[_privilegeId] = PrivilegeConfig({
-            privilegeId: _privilegeId,
+        ++privilegeId;
+        privilegeIdConfigs[privilegeId] = PrivilegeConfig({
+            privilegeId: privilegeId,
             status: "active",
             role: "OG",
             discount: 80,
             helpNumbers: 5
         });
-        exitPrivilegeIdConfigs[_privilegeId] = true;
+        exitPrivilegeIdConfigs[privilegeId] = true;
 
-        ++_privilegeId;
-        privilegeIdConfigs[_privilegeId] = PrivilegeConfig({
-            privilegeId: _privilegeId,
+        ++privilegeId;
+        privilegeIdConfigs[privilegeId] = PrivilegeConfig({
+            privilegeId: privilegeId,
             status: "inactive",
             role: "NORMAL",
             discount: 90,
             helpNumbers: 2 
         });
-        exitPrivilegeIdConfigs[_privilegeId] = true;
+        exitPrivilegeIdConfigs[privilegeId] = true;
     }
     function setMintPrice(uint256 _newMintPrice) public onlyOwner {
         emit MintPriceChanged(mintPrice, _newMintPrice);
@@ -72,38 +72,38 @@ contract ERC7766Example7 is ERC721, IERC7766, IERC7766Metadata, Ownable {
         uint256 discount,
         uint256 helpNumbers
     ) public onlyOwner {
-        privilegeIdConfigs[++_privilegeId] = PrivilegeConfig({
-            privilegeId: _privilegeId,
+        privilegeIdConfigs[++privilegeId] = PrivilegeConfig({
+            privilegeId: privilegeId,
             status: "active",
             role: role,
             discount: discount,
             helpNumbers: helpNumbers
         });
-        exitPrivilegeIdConfigs[_privilegeId] = true;
+        exitPrivilegeIdConfigs[privilegeId] = true;
     }
 
-    function removePrivilege(uint256 privilegeId) public onlyOwner {
-        require(exitPrivilegeIdConfigs[privilegeId], "Privilege not exist");
-        privilegeIdConfigs[privilegeId].status = "inactive";
+    function removePrivilege(uint256 _privilegeId) public onlyOwner {
+        require(exitPrivilegeIdConfigs[_privilegeId], "Privilege not exist");
+        privilegeIdConfigs[_privilegeId].status = "inactive";
     }
 
     function assignPrivilege(
-        uint256 privilegeId,
+        uint256 _privilegeId,
         uint256 tokenId
     ) public onlyOwner {
-        require(exitPrivilegeIdConfigs[privilegeId], "Privilege not exist");
-        tokenPrivilege[tokenId] = privilegeIdConfigs[privilegeId];
+        require(exitPrivilegeIdConfigs[_privilegeId], "Privilege not exist");
+        tokenPrivilege[tokenId] = privilegeIdConfigs[_privilegeId];
     }
 
     function getPrivilege(
-        uint256 privilegeId
+        uint256 _privilegeId
     )
         public
         view
         returns (uint256, string memory, string memory, uint256, uint256)
     {
-        require(exitPrivilegeIdConfigs[privilegeId], "Privilege not exist");
-        PrivilegeConfig memory privilege = privilegeIdConfigs[privilegeId];
+        require(exitPrivilegeIdConfigs[_privilegeId], "Privilege not exist");
+        PrivilegeConfig memory privilege = privilegeIdConfigs[_privilegeId];
         return (
             privilege.privilegeId,
             privilege.status,
@@ -114,14 +114,14 @@ contract ERC7766Example7 is ERC721, IERC7766, IERC7766Metadata, Ownable {
     }
 
     function getTokenPrivilege(
-        uint256 tokenId
+        uint256 _tokenId
     )
         public
         view
         returns (uint256, string memory, string memory, uint256, uint256)
     {
-         require(exitTokenPrivilege[tokenId], "Privilege not exist");
-        PrivilegeConfig memory privilege = tokenPrivilege[tokenId];
+         require(exitTokenPrivilege[_tokenId], "Privilege not exist");
+        PrivilegeConfig memory privilege = tokenPrivilege[_tokenId];
         return (
             privilege.privilegeId,
             privilege.status,
@@ -132,12 +132,12 @@ contract ERC7766Example7 is ERC721, IERC7766, IERC7766Metadata, Ownable {
     }
 
     function assignOgPrivilegeBatch(
-        uint256 privilegeId,
+        uint256 _privilegeId,
         uint256[] calldata tokenList
     ) external onlyOwner {
         require(tokenList.length > 0, "");
         for (uint i = 0; i < tokenList.length; i++) {
-            assignPrivilege(privilegeId, tokenList[i]);
+            assignPrivilege(_privilegeId, tokenList[i]);
         }
     }
 
@@ -179,13 +179,13 @@ contract ERC7766Example7 is ERC721, IERC7766, IERC7766Metadata, Ownable {
             ""
         );
 
-        (bytes memory data) = abi.encode(
+        (bytes memory dataDeal) = abi.encode(
             privilegeIdConfigs[_privilegeId].discount,
             _to
         );
         // Optional to deal with _data
         // dealWithData(_data);
-        dealWithData(data);
+        dealWithData(dataDeal);
 
         ++privilegeCounts[_tokenId];
         privilegeStates[_tokenId] = true;
