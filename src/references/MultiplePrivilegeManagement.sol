@@ -8,7 +8,7 @@ import "../../lib/openzeppelin-contracts/contracts/utils/Base64.sol";
 import "../interfaces/IERC7766.sol";
 import "../interfaces/IERC7766Metadata.sol";
 
-contract ERC7766Example9 is ERC721, IERC7766, IERC7766Metadata, Ownable {
+contract MultiplePrivilegeManagement is ERC721, IERC7766, IERC7766Metadata, Ownable {
     
     uint256 public privilegeId = 0;
 

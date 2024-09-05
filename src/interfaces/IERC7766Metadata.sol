@@ -3,7 +3,7 @@ pragma solidity >=0.7.0 <0.9.0;
 
 /// @title ERC-7766 Privileged Non-Fungible Tokens Tied To Real World Assets, optional metadata extension
 /// @dev See https://eips.ethereum.org/EIPS/eip-7766
-interface IERC7766Metadata { /* is IERC7766 */
+interface IERC7766Metadata /* is IERC7766 */ { 
     /// @notice A distinct Uniform Resource Identifier (URI) for a given privilegeId.
     /// @dev Throws if `_privilegeId` is not a valid privilegeId. URIs are defined in RFC
     ///  3986. The URI may point to a JSON file that conforms to the "ERC-7766

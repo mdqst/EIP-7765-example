@@ -3,10 +3,10 @@ pragma solidity >=0.7.0 <0.9.0;
 
 /// @title ERC-7766 Privileged Non-Fungible Tokens Tied To Real World Assets
 /// @dev See https://eips.ethereum.org/EIPS/eip-7766
-interface IERC7766 { /* is IERC721, IERC165 */
+interface IERC7766 /* is IERC721, IERC165 */ { 
     /// @notice This event emitted when a specific privilege of a token is successfully exercised.
     /// @param _operator  the address who exercised the privilege.
-    /// @param _to  the address to benifit from the privilege.
+    /// @param _to  the address to benefit from the privilege.
     /// @param _tokenId  the NFT tokenID.
     /// @param _privilegeId  the ID of the privileges.
     event PrivilegeExercised(
@@ -15,7 +15,7 @@ interface IERC7766 { /* is IERC721, IERC165 */
 
     /// @notice This function exercise a specific privilege of a token.
     /// @dev Throws if `_privilegeId` is not a valid privilegeId.
-    /// @param _to  the address to benifit from the privilege.
+    /// @param _to  the address to benefit from the privilege.
     /// @param _tokenId  the NFT tokenID.
     /// @param _privilegeId  the ID of the privileges.
     /// @param _data  extra data passed in for extra message or future extension.
@@ -23,7 +23,7 @@ interface IERC7766 { /* is IERC721, IERC165 */
 
     /// @notice This function is to check whether a specific privilege of a token can be exercised.
     /// @dev Throws if `_privilegeId` is not a valid privilegeId.
-    /// @param _to  the address to benifit from the privilege.
+    /// @param _to  the address to benefit from the privilege.
     /// @param _tokenId  the NFT tokenID.
     /// @param _privilegeId  the ID of the privileges.
     function isExercisable(address _to, uint256 _tokenId, uint256 _privilegeId)
@@ -33,7 +33,7 @@ interface IERC7766 { /* is IERC721, IERC165 */
 
     /// @notice This function is to check whether a specific privilege of a token has been exercised.
     /// @dev Throws if `_privilegeId` is not a valid privilegeId.
-    /// @param _to  the address to benifit from the privilege.
+    /// @param _to  the address to benefit from the privilege.
     /// @param _tokenId  the NFT tokenID.
     /// @param _privilegeId  the ID of the privileges.
     function isExercised(address _to, uint256 _tokenId, uint256 _privilegeId) external view returns (bool _exercised);

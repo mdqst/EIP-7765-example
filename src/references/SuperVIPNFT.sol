@@ -8,7 +8,7 @@ import "../../lib/openzeppelin-contracts/contracts/utils/Base64.sol";
 import "../interfaces/IERC7766.sol";
 import "../interfaces/IERC7766Metadata.sol";
 
-contract superVIP is ERC721, Ownable, IERC7766, IERC7766Metadata {
+contract SuperVIPNFT is ERC721, Ownable, IERC7766, IERC7766Metadata {
 
     uint256 private _nextTokenId;
     mapping(uint256 tokenId => uint256 privilegeId) private tokenPrivilegeId;

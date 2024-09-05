@@ -7,59 +7,23 @@ import "../../lib/openzeppelin-contracts/contracts/utils/Base64.sol";
 import "../interfaces/IERC7766.sol";
 import "../interfaces/IERC7766Metadata.sol";
 
-contract burnSomePrivilege is ERC721, IERC7766, IERC7766Metadata {
+contract BatchedPrivileges is ERC721, IERC7766, IERC7766Metadata {
+    /// @notice This event emitted when some specific privilege are successfully exercised.
+    /// @param _operator  the address who exercised the privilege.
+    /// @param _toArr  the addresses to benifit from the privilege.
+    /// @param _tokenIds  the NFT tokenID array.
+    /// @param _privilegeIds  the privilegeID array.
+    event BatchPrivilegeExercised(
+        address indexed _operator, address[] indexed _toArr, uint256[] indexed _tokenIds, uint256[] _privilegeIds
+    );
+
     uint256[] private privilegeIdsArr = [1, 2];
     mapping(uint256 privilegeId => bool) private privilegeIds;
-
     mapping(uint256 tokenId => mapping(uint256 privilegeId => address to)) privilegeStates;
-
-    mapping(uint256 => uint256[]) burnPrivilegeIds;
-
-
-    event BurnPrivilege(address indexed from, uint256 indexed tokenId, uint256 privilegeId);
 
     constructor(string memory name_, string memory symbol_) ERC721(name_, symbol_) {
         privilegeIds[1] = true;
         privilegeIds[2] = true;
-    }
-
-    /// @param _tokenId  the NFT tokenID.
-    /// @param _privilegeId  the ID of the privileges.
-    /// @param _data  extra data passed in for extra message or future extension.
-    function burnPrivilege(uint256 _tokenId, uint256 _privilegeId, bytes calldata _data) external {
-        require(ownerOf(_tokenId) == msg.sender, "Token not exist");
-        require(privilegeIds[_privilegeId], "Privilege not exist");
-        require(!checkPrivilegeIdIsBurn(_tokenId, _privilegeId),"privilegeId has been burned");
-
-        // Optional to deal with _data
-        dealWithData(_data);
-
-        uint256[] memory hasBurnPrivilegeIds = burnPrivilegeIds[_tokenId];
-
-
-        uint256[] memory newHasBurnPrivilegeIds = new uint256[](hasBurnPrivilegeIds.length + 1);
-        
-
-        for (uint i = 0; i < hasBurnPrivilegeIds.length; i++) {
-            newHasBurnPrivilegeIds[i] = hasBurnPrivilegeIds[i];
-        }
-
-        newHasBurnPrivilegeIds[hasBurnPrivilegeIds.length] = _privilegeId;
-
-        burnPrivilegeIds[_tokenId] = newHasBurnPrivilegeIds;
-        emit BurnPrivilege(msg.sender, _tokenId, _privilegeId);
-    }
-
-    function checkPrivilegeIdIsBurn(uint256 _tokenId, uint256 _privilegeId) internal view returns(bool) {
-        uint256[] memory hasBurnPrivilegeIds = burnPrivilegeIds[_tokenId];
-        bool privilegeIdIsBurn = false;
-        for (uint i = 0; i < hasBurnPrivilegeIds.length; i++) {
-            if (hasBurnPrivilegeIds[i] == _privilegeId) {
-                privilegeIdIsBurn = true;
-                break;
-            }
-        }
-        return privilegeIdIsBurn;
     }
 
     /// @notice This function exercised a specific privilege of a token if succeeds.
@@ -76,13 +40,46 @@ contract burnSomePrivilege is ERC721, IERC7766, IERC7766Metadata {
         require(ownerOf(_tokenId) == msg.sender, "Token not exist");
         require(privilegeIds[_privilegeId], "Privilege not exist");
         require(privilegeStates[_tokenId][_privilegeId] == address(0), "Privilege already exercised");
-        require(!checkPrivilegeIdIsBurn(_tokenId, _privilegeId),"privilegeId has been burned");
 
         // Optional to deal with _data
         dealWithData(_data);
 
         privilegeStates[_tokenId][_privilegeId] = _to;
         emit PrivilegeExercised(msg.sender, _to, _tokenId, _privilegeId);
+    }
+
+    /// @notice This function exercised a specific privilege of a token if succeeds.
+    /// @dev Throws if `_privilegeId` is not a valid privilegeId.
+    /// @param _toArr  the address to benifit from the privilege.
+    /// @param _tokenIds  the NFT tokenID.
+    /// @param _privilegeIds  the ID of the privileges.
+    /// @param _data  extra data passed in for extra message or future extension.
+    function batchExercisePrivileges(
+        address[] calldata _toArr,
+        uint256[] calldata _tokenIds,
+        uint256[] calldata _privilegeIds,
+        bytes calldata _data
+    ) external {
+        require(_tokenIds.length == _toArr.length, "Illegal _tokenIds length");
+        require(_privilegeIds.length == _toArr.length, "Illegal _privilegeIds length");
+
+        uint256 toLength = _toArr.length;
+        for (uint256 i = 0; i < toLength; i++) {
+            address to = _toArr[i];
+            uint256 tokenId = _tokenIds[i];
+            uint256 privilegeId = _privilegeIds[i];
+
+            require(ownerOf(tokenId) == msg.sender, "Token not exist");
+            require(privilegeIds[privilegeId], "Privilege not exist");
+            require(privilegeStates[tokenId][privilegeId] == address(0), "Privilege already exercised");
+
+            // Optional to deal with _data
+            dealWithData(_data);
+
+            privilegeStates[tokenId][privilegeId] = to;
+        }
+
+        emit BatchPrivilegeExercised(msg.sender, _toArr, _tokenIds, _privilegeIds);
     }
 
     function dealWithData(bytes calldata _data) internal {
@@ -102,7 +99,6 @@ contract burnSomePrivilege is ERC721, IERC7766, IERC7766Metadata {
         require(_to != address(0), "Illegal _to address");
         require(ownerOf(_tokenId) != address(0), "Token not exist");
         require(privilegeIds[_privilegeId], "Privilege not exist");
-        require(!checkPrivilegeIdIsBurn(_tokenId, _privilegeId),"privilegeId has been burned");
 
         return privilegeStates[_tokenId][_privilegeId] == address(0);
     }
@@ -116,7 +112,6 @@ contract burnSomePrivilege is ERC721, IERC7766, IERC7766Metadata {
         require(_to != address(0), "Illegal _to address");
         require(ownerOf(_tokenId) != address(0), "Token not exist");
         require(privilegeIds[_privilegeId], "Privilege not exist");
-        require(!checkPrivilegeIdIsBurn(_tokenId, _privilegeId),"privilegeId has been burned");
 
         return privilegeStates[_tokenId][_privilegeId] == _to;
     }
@@ -125,35 +120,7 @@ contract burnSomePrivilege is ERC721, IERC7766, IERC7766Metadata {
     /// @param _tokenId  the NFT tokenID.
     function getPrivilegeIds(uint256 _tokenId) external view returns (uint256[] memory) {
         require(ownerOf(_tokenId) != address(0), "Token not exist");
-        uint256[] memory hasBurnPrivilegeIds = burnPrivilegeIds[_tokenId];
-        if (hasBurnPrivilegeIds.length == 0) {
-            return privilegeIdsArr;
-        }
-
-        uint256[] memory allPrivilegeIds = privilegeIdsArr;
-
-        uint privilegeLength = allPrivilegeIds.length - hasBurnPrivilegeIds.length;
-
-        uint256[] memory validPrivilegeIds = new uint256[](privilegeLength);
-
-        for (uint k = 0; k < validPrivilegeIds.length; k++) {
-            uint256 validPrivilegeId;
-            for (uint i = 0; i < allPrivilegeIds.length; i++) {
-                uint256 privilegeId = allPrivilegeIds[i];
-                bool privilegeIdIsBurn = false;
-                for (uint j = 0; j < hasBurnPrivilegeIds.length; j++) {
-                    if (privilegeId == hasBurnPrivilegeIds[j]) {
-                        privilegeIdIsBurn = true;
-                        break;
-                    }
-                }
-                if (!privilegeIdIsBurn) {
-                    validPrivilegeId = privilegeId;
-                }
-            }
-            validPrivilegeIds[k] = validPrivilegeId;
-        }
-        return validPrivilegeIds;
+        return privilegeIdsArr;
     }
 
     /// @notice A distinct Uniform Resource Identifier (URI) for a given privilegeId.
