@@ -2,11 +2,11 @@
 pragma solidity >=0.7.0 <0.9.0;
 
 import "forge-std/Test.sol";
-import "../../src/examples/ERC7766Example9.sol";
+import "../../src/references/MultiplePrivilegeManagement.sol";
 
 contract ERC7766Example9Test is Test {
 
-    ERC7766Example9 private example;
+    MultiplePrivilegeManagement private example;
     address private owner;
     address private user1;
     uint256 private tokenId = 1;
@@ -16,7 +16,7 @@ contract ERC7766Example9Test is Test {
     function setUp() public {
         owner = address(this);
         user1 = address(0xd0C05c200f933987376779184bD5B41DFaAc2D67);
-        example = new ERC7766Example9("Test Token", "TST", owner);
+        example = new MultiplePrivilegeManagement("Test Token", "TST", owner);
     }
 
     function testReleasePrivilege() public {
