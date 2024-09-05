@@ -7,7 +7,7 @@ import "../../lib/openzeppelin-contracts/contracts/utils/Base64.sol";
 import "../interfaces/IERC7766.sol";
 import "../interfaces/IERC7766Metadata.sol";
 
-contract ERC7766Example5 is ERC721, IERC7766, IERC7766Metadata {
+contract burnSomePrivilege is ERC721, IERC7766, IERC7766Metadata {
     uint256[] private privilegeIdsArr = [1, 2];
     mapping(uint256 privilegeId => bool) private privilegeIds;
 
@@ -126,23 +126,32 @@ contract ERC7766Example5 is ERC721, IERC7766, IERC7766Metadata {
     function getPrivilegeIds(uint256 _tokenId) external view returns (uint256[] memory) {
         require(ownerOf(_tokenId) != address(0), "Token not exist");
         uint256[] memory hasBurnPrivilegeIds = burnPrivilegeIds[_tokenId];
+        if (hasBurnPrivilegeIds.length == 0) {
+            return privilegeIdsArr;
+        }
 
         uint256[] memory allPrivilegeIds = privilegeIdsArr;
 
-        uint256[] memory validPrivilegeIds;
+        uint privilegeLength = allPrivilegeIds.length - hasBurnPrivilegeIds.length;
 
-        for (uint i = 0; i < allPrivilegeIds.length; i++) {
-            uint256 privilegeId = allPrivilegeIds[i];
-            bool privilegeIdIsBurn = false;
-            for (uint j = 0; j < hasBurnPrivilegeIds.length; j++) {
-                if (privilegeId == hasBurnPrivilegeIds[j]) {
-                    privilegeIdIsBurn = true;
-                    break;
+        uint256[] memory validPrivilegeIds = new uint256[](privilegeLength);
+
+        for (uint k = 0; k < validPrivilegeIds.length; k++) {
+            uint256 validPrivilegeId;
+            for (uint i = 0; i < allPrivilegeIds.length; i++) {
+                uint256 privilegeId = allPrivilegeIds[i];
+                bool privilegeIdIsBurn = false;
+                for (uint j = 0; j < hasBurnPrivilegeIds.length; j++) {
+                    if (privilegeId == hasBurnPrivilegeIds[j]) {
+                        privilegeIdIsBurn = true;
+                        break;
+                    }
+                }
+                if (!privilegeIdIsBurn) {
+                    validPrivilegeId = privilegeId;
                 }
             }
-            if (!privilegeIdIsBurn) {
-                validPrivilegeIds.push(privilegeId);
-            }
+            validPrivilegeIds[k] = validPrivilegeId;
         }
         return validPrivilegeIds;
     }

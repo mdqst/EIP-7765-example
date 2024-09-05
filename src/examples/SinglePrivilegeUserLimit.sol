@@ -7,7 +7,7 @@ import "../../lib/openzeppelin-contracts/contracts/utils/Base64.sol";
 import "../interfaces/IERC7766.sol";
 import "../interfaces/IERC7766Metadata.sol";
 
-contract ERC7766Example3 is ERC721, IERC7766, IERC7766Metadata {
+contract SinglePrivilegeUserLimit is ERC721, IERC7766, IERC7766Metadata {
 
     uint256[] private privilegeIdsArr = [1, 2];
     mapping(uint256 privilegeId => bool) private privilegeIds;
