@@ -70,7 +70,7 @@ contract RentHouseNFT is ERC721, Ownable {
     }
 
     function isExercisable(
-        address to,
+        address,
         uint256 tokenId,
         uint256 privilegeId
     ) external view returns (bool) {
@@ -80,7 +80,7 @@ contract RentHouseNFT is ERC721, Ownable {
     }
 
     function isExercised(
-        address to,
+        address,
         uint256 tokenId,
         uint256 privilegeId
     ) external view returns (bool) {
@@ -88,7 +88,7 @@ contract RentHouseNFT is ERC721, Ownable {
     }
 
     function getPrivilegeIds(
-        uint256 tokenId
+        uint256
     ) external pure returns (uint256[] memory) {
         uint256[] memory privilegeIds;
         privilegeIds[0] = RENT_PAYMENT;

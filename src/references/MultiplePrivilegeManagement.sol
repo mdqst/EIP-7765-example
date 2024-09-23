@@ -5,10 +5,10 @@ import "../../lib/openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
 import "../../lib/openzeppelin-contracts/contracts/access/Ownable.sol";
 import "../../lib/openzeppelin-contracts/contracts/utils/Strings.sol";
 import "../../lib/openzeppelin-contracts/contracts/utils/Base64.sol";
-import "../interfaces/IERC7766.sol";
-import "../interfaces/IERC7766Metadata.sol";
+import "../interfaces/IERC7765.sol";
+import "../interfaces/IERC7765Metadata.sol";
 
-contract MultiplePrivilegeManagement is ERC721, IERC7766, IERC7766Metadata, Ownable {
+contract MultiplePrivilegeManagement is ERC721, IERC7765, IERC7765Metadata, Ownable {
     
     uint256 public privilegeId = 0;
 
@@ -172,7 +172,7 @@ contract MultiplePrivilegeManagement is ERC721, IERC7766, IERC7766Metadata, Owna
 
     /// @notice A distinct Uniform Resource Identifier (URI) for a given privilegeId.
     /// @dev Throws if `_privilegeId` is not a valid privilegeId. URIs are defined in RFC
-    ///  3986. The URI may point to a JSON file that conforms to the "ERC-7766
+    ///  3986. The URI may point to a JSON file that conforms to the "ERC-7765
     ///  Metadata JSON Schema".
     function privilegeURI(
         uint256 _privilegeId

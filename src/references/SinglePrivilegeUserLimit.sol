@@ -4,10 +4,10 @@ pragma solidity >=0.7.0 <0.9.0;
 import "../../lib/openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
 import "../../lib/openzeppelin-contracts/contracts/utils/Strings.sol";
 import "../../lib/openzeppelin-contracts/contracts/utils/Base64.sol";
-import "../interfaces/IERC7766.sol";
-import "../interfaces/IERC7766Metadata.sol";
+import "../interfaces/IERC7765.sol";
+import "../interfaces/IERC7765Metadata.sol";
 
-contract SinglePrivilegeUserLimit is ERC721, IERC7766, IERC7766Metadata {
+contract SinglePrivilegeUserLimit is ERC721, IERC7765, IERC7765Metadata {
 
     uint256[] private privilegeIdsArr = [1, 2];
     mapping(uint256 privilegeId => bool) private privilegeIds;
@@ -104,7 +104,7 @@ contract SinglePrivilegeUserLimit is ERC721, IERC7766, IERC7766Metadata {
 
     /// @notice A distinct Uniform Resource Identifier (URI) for a given privilegeId.
     /// @dev Throws if `_privilegeId` is not a valid privilegeId. URIs are defined in RFC
-    ///  3986. The URI may point to a JSON file that conforms to the "ERC-7766
+    ///  3986. The URI may point to a JSON file that conforms to the "ERC-7765
     ///  Metadata JSON Schema".
     function privilegeURI(uint256 _privilegeId) external view returns (string memory) {
         require(privilegeIds[_privilegeId], "Privilege not exist");

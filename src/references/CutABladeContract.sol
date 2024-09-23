@@ -5,10 +5,10 @@ import "../../lib/openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
 import "../../lib/openzeppelin-contracts/contracts/access/Ownable.sol";
 import "../../lib/openzeppelin-contracts/contracts/utils/Strings.sol";
 import "../../lib/openzeppelin-contracts/contracts/utils/Base64.sol";
-import "../interfaces/IERC7766.sol";
-import "../interfaces/IERC7766Metadata.sol";
+import "../interfaces/IERC7765.sol";
+import "../interfaces/IERC7765Metadata.sol";
 
-contract CutABladeContract is ERC721, IERC7766, IERC7766Metadata, Ownable {
+contract CutABladeContract is ERC721, IERC7765, IERC7765Metadata, Ownable {
     uint256 public privilegeId;
     mapping(uint256 _privilegeId => PrivilegeConfig) private privilegeIdConfigs;
     mapping(uint256 _privilegeId => bool) private exitPrivilegeIdConfigs;
@@ -146,12 +146,11 @@ contract CutABladeContract is ERC721, IERC7766, IERC7766Metadata, Ownable {
     /// @param _to  the address to benifit from the privilege.
     /// @param _tokenId  the NFT tokenID.
     /// @param _privilegeId  the ID of the privileges.
-    /// @param _data  extra data passed in for extra message or future extension.
     function exercisePrivilege(
         address _to,
         uint256 _tokenId,
         uint256 _privilegeId,
-        bytes calldata _data
+        bytes calldata
     ) external {
         address send = msg.sender;
         if (_to == address(0)) {
@@ -206,11 +205,10 @@ contract CutABladeContract is ERC721, IERC7766, IERC7766Metadata, Ownable {
 
     /// @notice This function is to check whether a specific privilege of a token can be exercised.
     /// @dev Throws if `_privilegeId` is not a valid privilegeId.
-    /// @param _to  the address to benifit from the privilege.
     /// @param _tokenId  the NFT tokenID.
     /// @param _privilegeId  the ID of the privileges.
     function isExercisable(
-        address _to,
+        address,
         uint256 _tokenId,
         uint256 _privilegeId
     ) external view returns (bool _exercisable) {
@@ -270,7 +268,7 @@ contract CutABladeContract is ERC721, IERC7766, IERC7766Metadata, Ownable {
 
     /// @notice A distinct Uniform Resource Identifier (URI) for a given privilegeId.
     /// @dev Throws if `_privilegeId` is not a valid privilegeId. URIs are defined in RFC
-    ///  3986. The URI may point to a JSON file that conforms to the "ERC-7766
+    ///  3986. The URI may point to a JSON file that conforms to the "ERC-7765
     ///  Metadata JSON Schema".
     function privilegeURI(
         uint256 _privilegeId
